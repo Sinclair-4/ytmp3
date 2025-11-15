@@ -55,14 +55,21 @@ class App:
         url = input("Enter the URL: ").strip()
         
         if url == 'q' or url == 'Q':
-            print("Aborting...")
+            print("-> Aborting...")
             return
+        
+        remove = url.find("&list=")
+
+        if remove != -1:
+            print("-> Sanitizing URL...")
+            url = url[:remove]
+            print("-> URL sanitized:", url)
         
         if url and url not in self.urls:
             self.urls.append(url)
-            print(f"Added URL ({len(self.urls)} total)")
+            print(f"-> Added URL ({len(self.urls)} total)")
         else:
-            print("URL is empty or already in list")
+            print("-> URL is empty or already in list")
 
 
     def remove_url(self):

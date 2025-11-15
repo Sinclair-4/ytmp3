@@ -4,16 +4,10 @@ A simple python script that allows you to download yt links as mp3 file
 
 ## Url format
 
-Good:
-
 ```
-https://www.youtube.com/watch?v=j_sG_Juncn8
-```
-
-Bad:
-
-```
-https://www.youtube.com/watch?v=j_sG_Juncn8&list=RDh2B5F8skpGE&index=9
+https://www.youtube.com/watch?v=xvFZjo5PgG0
+ - or -
+https://www.youtube.com/watch?v=xvFZjo5PgG0&list=RDxvFZjo5PgG0&start_radio=1
 ```
 
 ## Setup Instructions
