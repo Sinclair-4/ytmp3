@@ -21,11 +21,12 @@ class FFMPEG:
     def download_zip(self):
         # Check if zip is already downloaded
         if os.path.exists(f"{self._dir}/{self.zip}"):
-            print("FFMPEG zip is already downloaded.")
+            print("-> FFMPEG zip is already downloaded.")
             return
         
         try:
-            print("Downloading FFmpeg...")
+            print("-> Downloading FFmpeg...")
+            print("-> This will take a moment...")
             response = requests.get(self.url)
 
             if response.status_code == 200:
@@ -33,16 +34,17 @@ class FFMPEG:
                 with open(f"{self._dir}/{self.zip}", 'wb') as file:
                     file.write(response.content)
 
-                print("File downloaded successfully!")
+                print("-> File downloaded successfully!")
             else:
-                print("Download failed.")
+                print("-> Download failed.")
 
         except Exception as e:
-            print("Error downloading file:", e)
+            print("-> Error downloading file:", e)
 
     def extract_zip(self):
         with zip.ZipFile(f"{self._dir}/{self.zip}", "r") as z_ref:
             try: 
+                print("-> Extracting FFmpeg executables...")
                 # Extract ffmpeg.exe and ffprobe.exe
                 ffmpeg = z_ref.read("ffmpeg-8.0-essentials_build/bin/ffmpeg.exe")
                 ffprobe = z_ref.read("ffmpeg-8.0-essentials_build/bin/ffprobe.exe")
@@ -55,21 +57,20 @@ class FFMPEG:
                 with open(f"{self.folder}/ffprobe.exe", 'wb') as f:
                     f.write(ffprobe)
 
-                print("FFmpeg executables extracted successfully!")
+                print("-> FFmpeg executables extracted successfully!")
             except Exception as e:
-                print("Error extracting FFmpeg executables:", e)
+                print("-> Error extracting FFmpeg executables:", e)
 
     def init(self):
+        print("[FFMPEG] Initializing...")
         if os.path.exists("ffmpeg/ffmpeg.exe" and "ffmpeg/ffprobe.exe"):
-            print("FFmpeg executables are already installed.")
+            print("-> Executables found.")
             return
         
         if os.path.exists(f"{self.folder}/ffmpeg"):
             shutil.rmtree(f"{self.folder}/ffmpeg")
 
-        print("This will only run once.")
-        print("Initializing FFMPEG...")
-        print("Do not close the terminal...")
+        print("-> This will only run once.")
 
         self.init_folder()
         self.download_zip()

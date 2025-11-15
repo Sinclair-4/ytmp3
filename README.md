@@ -32,6 +32,12 @@ setup.bat
 ```
 Or double click the setup file inside the project directory
 
+### 3. Run program
+```bash
+ytmp3
+```
+After running the setup, you should be able to call this system-wide in cmd
+
 ## Acknowledgements
 
 This project uses:  

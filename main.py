@@ -1,23 +1,30 @@
-import sys
-from pathlib import Path
 from yt_dlp_script import YtMp3
 from FFMPEG import FFMPEG
+from pathlib import Path
+import sys
+import os
 
-class AudioDownloader:
+class App:
     def __init__(self):
         self.urls = []
-        self.yt_downloader = None
-        self.ffmpeg = FFMPEG()
+        self._dir = Path(__file__).parent
+        self.ffmpeg = None
+        self.downloader = None
+        self.output_dir = None
+        self.ffmpeg_location = Path(self._dir / "ffmpeg")
 
-    def initialize_ffmpeg(self) -> bool:
+
+    def init_ffmpeg(self) -> bool:
         try:
+            self.ffmpeg = FFMPEG()
             self.ffmpeg.init()
             return True
         except Exception as e:
-            print(f"Failed to initialize FFMPEG: {e}")
+            print(f"-> Error initializing FFMPEG: {e}")
             return False
-
-    def get_output_directory(self) -> str:
+        
+    
+    def set_output_dir(self):
         while True:
             output = input("Enter the output directory: ").strip()
 
@@ -28,35 +35,35 @@ class AudioDownloader:
             confirm = input("Confirm? (y/n): ").lower()
 
             if confirm == 'y':
+                print(f"-> output_dir: {Path(output)}")
                 return output
 
-        # return 'C:/Users/user/Music/'
-
-    def initialize_downloader(self) -> bool:
-        if not self.initialize_ffmpeg():
-            return False
-
-        output_dir = self.get_output_directory()
-        ffmpeg_path = Path.cwd() / "ffmpeg"
-
+    def init_downloader(self) -> bool:
         try:
-            self.yt_downloader = YtMp3(
-                output=output_dir,
-                ffmpeg_location=ffmpeg_path
+            self.downloader = YtMp3(
+                ffmpeg_location = str(self.ffmpeg_location),
+                output = str(self.output_dir)
             )
-            print("Downloader initialized successfully!")
+            print("-> Downloader initialized successfully!")
             return True
         except Exception as e:
-            print(f"Failed to initialize downloader: {e}")
+            print(f"-> Error initializing Downloader: {e}")
             return False
+        
 
     def add_url(self):
         url = input("Enter the URL: ").strip()
+        
+        if url == 'q' or url == 'Q':
+            print("Aborting...")
+            return
+        
         if url and url not in self.urls:
             self.urls.append(url)
             print(f"Added URL ({len(self.urls)} total)")
         else:
             print("URL is empty or already in list")
+
 
     def remove_url(self):
         if not self.urls:
@@ -76,42 +83,18 @@ class AudioDownloader:
         except ValueError:
             print("Please enter a valid number")
 
+
     def view_urls(self):
         if not self.urls:
             print("No URLs in download list")
             return
 
-        print("\nDownload List:")
-        print("-" * 50)
+        print("Download List:")
+        print("----=====================================----")
         for i, url in enumerate(self.urls, 1):
             print(f"{i:2d}. {url}")
         print(f"Total: {len(self.urls)} URL(s)")
 
-    def download_all(self):
-        if not self.urls:
-            print("No URLs to download")
-            return
-
-        if not self.yt_downloader:
-            print("Downloader not initialized")
-            return
-
-        print(f"\nStarting download of {len(self.urls)} file(s)...")
-        print("-" * 50)
-        
-        successful_downloads = 0
-        for i, url in enumerate(self.urls, 1):
-            print(f"\nDownloading {i}/{len(self.urls)}...")
-            try:
-                download = self.yt_downloader.downloadMP3(url)
-
-                if download:
-                    successful_downloads += 1
-                    
-            except Exception as e:
-                print(f"Download {i} failed: {e}")
-        
-        print(f"\nDownload summary: {successful_downloads}/{len(self.urls)} successful")
 
     def clear_list(self):
         if self.urls:
@@ -122,27 +105,71 @@ class AudioDownloader:
         else:
             print("List is already empty")
 
-    def run(self):
-        print("YouTube Audio Downloader")
-        print("=" * 40)
-        
-        if not self.initialize_downloader():
-            print("Failed to initialize application")
-            sys.exit(1)
 
+    def download_all(self):
+        if not self.urls:
+            print("No URLs to download")
+            return
+
+        if not self.downloader:
+            print("Downloader not initialized")
+            return
+
+        print(f"Starting download of {len(self.urls)} file(s)...")
+        print("----=====================================----")
+        
+        successful_downloads = 0
+        for i, url in enumerate(self.urls, 1):
+            print(f"\nDownloading {i}/{len(self.urls)}...")
+            try:
+                download = self.downloader.downloadMP3(url)
+
+                if download:
+                    successful_downloads += 1
+                    
+            except Exception as e:
+                print(f"Download {i} failed: {e}")
+        
+        print(f"\nDownload summary: {successful_downloads}/{len(self.urls)} successful")
+
+
+    def run(self):
+        print("----=====================================----")
+        print("|              YTMP3 - Sinclair             |")
+        print("----=====================================----")
+        print("[YTMP3] ---< Initializing FFMPEG >-----------")
+        if not self.init_ffmpeg():
+            print("Failed to initialize FFMPEG")
+            sys.exit(1)
+        print()
+        print("----=====================================----")
+        print("[YTMP3] --< Setting Output Directory >-------")
+        self.output_dir = self.set_output_dir()
+        print()
+        print("----=====================================----")
+        print("[YTMP3] --< Initializing Downloader >--------")
+        if not self.init_downloader():
+            print("Failed to initialize Downloader")
+            sys.exit(1)
+        print()
+        
         while True:
-            print("\n" + "=" * 40)
-            print("MAIN MENU")
-            print("=" * 40)
-            print("[1] Add URL to download")
-            print("[2] Remove URL from list") 
-            print("[3] View all URLs")
-            print("[4] Clear all URLs")
-            print("[5] Download all URLs")
-            print("[6] Exit")
+            print("----=====================================----")
+            print("|                 MAIN MENU                 |")
+            print("----=====================================----")
+            print("|         [1] Add URL to download           |")
+            print("|         [2] Remove URL from list          |") 
+            print("|         [3] View all URLs                 |")
+            print("|         [4] Clear all URLs                |")
+            print("|         [5] Download all URLs             |")
+            print("|         [6] Exit                          |")
+            print("----=====================================----")
             print()
 
-            choice = input("Enter your choice (1-6): ").strip()
+            choice = None
+            while choice not in ["1", "2", "3", "4", "5", "6"]:
+                choice = input("Enter your choice (1-6): ").strip()
+            print()
 
             if choice == "1":
                 self.add_url()
@@ -155,24 +182,17 @@ class AudioDownloader:
             elif choice == "5":
                 self.download_all()
             elif choice == "6":
-                print("\nThank you for using YTMP3!")
-                print(" - Sinclair")
+                print("----=====================================----")
+                print("\\     -< Thank you for using YTMP3! >-      /")
+                print("/             -< Sinclair >-                \\")
+                print("----=====================================----")
                 break
             else:
                 print("Invalid choice. Please enter 1-6.")
 
-
-def main():
-    try:
-        downloader = AudioDownloader()
-        downloader.run()
-    except KeyboardInterrupt:
-        print("\nProgram interrupted by user")
-        sys.exit(1)
-    except Exception as e:
-        print(f"\nUnexpected error: {e}")
-        sys.exit(1)
-
+            print()
 
 if __name__ == "__main__":
-    main()
+    os.system('cls')
+    app = App()
+    app.run()

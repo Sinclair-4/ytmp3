@@ -111,25 +111,25 @@ class YtMp3:
         print("[YT_DLP] Validating FFmpeg location...")
 
         if (self.ffmpeg_location == ""):
-            print("--> Error: FFmpeg location not specified.")
+            print("-> Error: FFmpeg location not specified.")
             return False
         
         if not Path(self.ffmpeg_location).exists():
-            print(f"--> Error: FFmpeg location '{self.ffmpeg_location}' does not exist.")
+            print(f"-> Error: FFmpeg location '{self.ffmpeg_location}' does not exist.")
             return False
         
         ffmpeg = Path(self.ffmpeg_location) / "ffmpeg.exe"
         ffprobe = Path(self.ffmpeg_location) / "ffprobe.exe"
 
         if not ffmpeg.exists():
-            print(f"--> Error: FFmpeg executable '{ffmpeg}' does not exist.")
+            print(f"-> Error: FFmpeg executable '{ffmpeg}' does not exist.")
             return False
 
         if not ffprobe.exists():
-            print(f"--> Error: FFmpeg executable '{ffprobe}' does not exist.")
+            print(f"-> Error: FFmpeg executable '{ffprobe}' does not exist.")
             return False
 
-        print("--> FFmpeg location is valid.")
+        print("-> FFmpeg location is valid.")
         return True
     
 
@@ -149,14 +149,14 @@ class YtMp3:
             file_output = Path(self.output_dir) / f"{title}.mp3"
 
             if file_output.exists():
-                print(f"--> File '{file_output}' already exists.")
+                print(f"-> File '{file_output}' already exists.")
                 return {
                     "exists": True,
                     "title": title,
                     "file_output": file_output
                 }
             else:
-                print(f"--> File '{file_output}' does not exist.")
+                print(f"-> File '{file_output}' does not exist.")
                 return {
                     "exists": False,
                     "title": title,
@@ -174,10 +174,10 @@ class YtMp3:
         check_duplicate = self.check_duplicate(url)
 
         if check_duplicate["exists"]:
-            print("--> Skipping download")
+            print("-> Skipping download")
             return False
         elif not check_duplicate["exists"]:
-            print("--> Continuing download...")
+            print("-> Continuing download...")
             title = check_duplicate["title"]
             file_output = check_duplicate["file_output"]
         
@@ -199,8 +199,9 @@ class YtMp3:
                 print("[YT_DLP] Started downloading MP3...")
                 ydl.download([url])
 
+            print()
             print(f"[YT_DLP] Download '{title}' completed.")
-            print(f"--> File saved to: {file_output}")
+            print(f"-> File saved to: {file_output}")
 
             return True
 
