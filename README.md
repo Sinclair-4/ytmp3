@@ -26,36 +26,11 @@ git clone https://github.com/Sinclair-4/ytmp3
 cd ytmp3
 ```
 
-### 2. Create a virtual environment
+### 2. Run setup
 ```bash
-python -m venv venv
+setup.bat
 ```
-
-### 3. Activate the virtual environment
-```bash
-venv\Scripts\activate
-```
-
-### 4. Install dependencies
-```bash
-pip install -r requirements.txt
-```
-
-### 5. Run the project
-```bash
-python main.py
-```
-
-### Or just download the setup script
-Download the setup script below and run it in the folder where you want the project created: 
-[setup.bat](./setup.bat)
-
-### Add to System PATH
-
-Add this folder to your system `PATH` environment variable so you can call the script from anywhere using:
-```bash
-ytmp3
-```
+Or double click the setup file inside the project directory
 
 ## Acknowledgements
 
