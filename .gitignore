@@ -1,0 +1,6 @@
+venv/
+_pycache_/
+*.pyc
+ffmpeg/
+ffmpeg.zip
+testing.py
