@@ -29,7 +29,7 @@ class App:
             output = input("Enter the output directory: ").strip()
 
             if not Path(output).exists():
-                print(f"Directory '{output}' does not exist")
+                print(f"-> Directory '{output}' does not exist")
                 continue
 
             confirm = input("Confirm? (y/n): ").lower()
@@ -74,7 +74,7 @@ class App:
 
     def remove_url(self):
         if not self.urls:
-            print("No URLs to remove")
+            print("-> No URLs to remove")
             return
 
         self.view_urls()
@@ -84,11 +84,11 @@ class App:
             choice = int(input("Enter the number of the URL to remove: "))
             if 1 <= choice <= len(self.urls):
                 removed_url = self.urls.pop(choice - 1)
-                print(f"Removed: {removed_url}")
+                print(f"-> Removed: {removed_url}")
             else:
-                print("Invalid number")
+                print("-> Invalid number")
         except ValueError:
-            print("Please enter a valid number")
+            print("-> Please enter a valid number")
 
 
     def view_urls(self):
@@ -108,7 +108,7 @@ class App:
             confirm = input(f"Clear all {len(self.urls)} URLs? (y/n): ").lower()
             if confirm == 'y':
                 self.urls.clear()
-                print("All URLs cleared")
+                print("-> All URLs cleared")
         else:
             print("List is already empty")
 
@@ -137,7 +137,8 @@ class App:
             except Exception as e:
                 print(f"Download {i} failed: {e}")
         
-        print(f"\nDownload summary: {successful_downloads}/{len(self.urls)} successful")
+        print()
+        print(f"Download summary: {successful_downloads}/{len(self.urls)} successful")
 
 
     def run(self):
