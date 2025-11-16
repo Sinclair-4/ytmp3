@@ -8,29 +8,40 @@ class YtMp3:
         self.output_dir = Path(output)
         self.ffmpeg_location = Path(ffmpeg_location)  
 
+    def printErr(self, message):
+        print(f"\033[91m{message}\033[0m")
+
+    def printSuccess(self, message):
+        print(f"\033[92m{message}\033[0m")
+
     def validate_ffmpeg_location(self) -> bool:
         print("[YT_DLP] Validating FFmpeg location...")
 
         if (self.ffmpeg_location == ""):
-            print("-> Error: FFmpeg location not specified.")
+            # print("-> Error: FFmpeg location not specified.")
+            self.printErr("-> Error: FFmpeg location not specified.")
             return False
         
         if not Path(self.ffmpeg_location).exists():
-            print(f"-> Error: FFmpeg location '{self.ffmpeg_location}' does not exist.")
+            # print(f"-> Error: FFmpeg location '{self.ffmpeg_location}' does not exist.")
+            self.printErr(f"-> Error: FFmpeg location '{self.ffmpeg_location}' does not exist.")
             return False
         
         ffmpeg = Path(self.ffmpeg_location) / "ffmpeg.exe"
         ffprobe = Path(self.ffmpeg_location) / "ffprobe.exe"
 
         if not ffmpeg.exists():
-            print(f"-> Error: FFmpeg executable '{ffmpeg}' does not exist.")
+            # print(f"-> Error: FFmpeg executable '{ffmpeg}' does not exist.")
+            self.printErr(f"-> Error: FFmpeg executable '{ffmpeg}' does not exist.")
             return False
 
         if not ffprobe.exists():
-            print(f"-> Error: FFmpeg executable '{ffprobe}' does not exist.")
+            # print(f"-> Error: FFmpeg executable '{ffprobe}' does not exist.")
+            self.printErr(f"-> Error: FFmpeg executable '{ffprobe}' does not exist.")
             return False
 
-        print("-> FFmpeg location is valid.")
+        # print("-> FFmpeg location is valid.")
+        self.printSuccess("-> FFmpeg location is valid.")
         return True
     
 
@@ -50,14 +61,16 @@ class YtMp3:
             file_output = Path(self.output_dir) / f"{title}.mp3"
 
             if file_output.exists():
-                print(f"-> File '{file_output}' already exists.")
+                # print(f"-> File '{file_output}' already exists.")
+                self.printErr(f"-> File '{file_output}' already exists.")
                 return {
                     "exists": True,
                     "title": title,
                     "file_output": file_output
                 }
             else:
-                print(f"-> File '{file_output}' does not exist.")
+                # print(f"-> File '{file_output}' does not exist.")
+                self.printSuccess(f"-> File '{file_output}' does not exist.")
                 return {
                     "exists": False,
                     "title": title,
@@ -65,7 +78,8 @@ class YtMp3:
                 }
 
         except Exception as e:
-            print(f"Error downloading '{url}': {e}")
+            # print(f"Error downloading '{url}': {e}")
+            self.printErr(f"Error downloading '{url}': {e}")
 
 
     def downloadMP3(self, url):
@@ -75,10 +89,12 @@ class YtMp3:
         check_duplicate = self.check_duplicate(url)
 
         if check_duplicate["exists"]:
-            print("-> Skipping download")
+            # print("-> Skipping download")
+            self.printErr("-> Skipping download")
             return False
         elif not check_duplicate["exists"]:
-            print("-> Continuing download...")
+            # print("-> Continuing download...")
+            self.printSuccess("-> Continuing download...")
             title = check_duplicate["title"]
             file_output = check_duplicate["file_output"]
         
@@ -101,13 +117,16 @@ class YtMp3:
                 ydl.download([url])
 
             print("--------------------------------------------")
-            print(f"[YT_DLP] Download '{title}' completed.")
-            print(f"-> File saved to: {file_output}")
+            # print(f"[YT_DLP] Download '{title}' completed.")
+            self.printSuccess(f"[YT_DLP] Download '{title}' completed.")
+            # print(f"-> File saved to: {file_output}")
+            self.printSuccess(f"-> File saved to: {file_output}")
 
             return True
 
         except Exception as e:
-            print(f"Error downloading '{url}': {e}")
+            # print(f"Error downloading '{url}': {e}")
+            self.printErr(f"Error downloading '{url}': {e}")
         
 if __name__ == "__main__":
     ytmp3 = YtMp3( 

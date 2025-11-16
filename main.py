@@ -1,6 +1,7 @@
 from yt_dlp_script import YtMp3
 from FFMPEG import FFMPEG
 from pathlib import Path
+import requests
 import sys
 import os
 
@@ -14,13 +15,20 @@ class App:
         self.ffmpeg_location = Path(self._dir / "ffmpeg")
 
 
+    def printErr(self, message):
+        print(f"\033[91m{message}\033[0m")
+    def printSuccess(self, message):
+        print(f"\033[92m{message}\033[0m")
+
+
     def init_ffmpeg(self) -> bool:
         try:
             self.ffmpeg = FFMPEG()
             self.ffmpeg.init()
             return True
         except Exception as e:
-            print(f"-> Error initializing FFMPEG: {e}")
+            # print(f"-> Error initializing FFMPEG: {e}")
+            self.printErr(f"-> Error initializing FFMPEG: {e}")
             return False
         
     
@@ -29,13 +37,15 @@ class App:
             output = input("Enter the output directory: ").strip()
 
             if not Path(output).exists():
-                print(f"-> Directory '{output}' does not exist")
+                # print(f"-> Directory '{output}' does not exist")
+                self.printErr(f"-> Directory '{output}' does not exist")
                 continue
 
             confirm = input("Confirm? (y/n): ").lower()
 
             if confirm == 'y':
-                print(f"-> output_dir: {Path(output)}")
+                # print(f"-> output_dir: {Path(output)}")
+                self.printSuccess(f"-> Output set to: {Path(output)}")
                 return output
 
     def init_downloader(self) -> bool:
@@ -44,32 +54,64 @@ class App:
                 ffmpeg_location = str(self.ffmpeg_location),
                 output = str(self.output_dir)
             )
-            print("-> Downloader initialized successfully!")
+            # print("-> Downloader initialized successfully!")
+            self.printSuccess("-> Downloader initialized successfully!")
             return True
         except Exception as e:
-            print(f"-> Error initializing Downloader: {e}")
+            # print(f"-> Error initializing Downloader: {e}")
+            self.printErr(f"-> Error initializing Downloader: {e}")
             return False
         
 
-    def add_url(self):
-        url = input("Enter the URL: ").strip()
-        
-        if url == 'q' or url == 'Q':
-            print("-> Aborting...")
-            return
-        
-        remove = url.find("&list=")
+    def is_valid_yt_url(self, url):
+        try:
+            res = requests.get(url, timeout=5, stream=True, allow_redirects=True)
+            res.close()
+            # print("-> Input URL is valid.")
+            self.printSuccess("-> Input URL is valid.")
+            return True
+        except Exception as e:
+            # print("-> Error validating URL:", e)
+            self.printErr("-> Error validating URL:", e)
+            return False
 
-        if remove != -1:
-            print("-> Sanitizing URL...")
-            url = url[:remove]
-            print("-> URL sanitized:", url)
+
+    def add_url(self):
         
-        if url and url not in self.urls:
-            self.urls.append(url)
-            print(f"-> Added URL ({len(self.urls)} total)")
-        else:
-            print("-> URL is empty or already in list")
+        while True: 
+            print("[YTMP3] Enter 'q' or 'Q' to quit adding url...")
+            url = ''
+            while url.strip() == '':  
+                url = input("Enter the URL: ").strip()
+            
+            if url == 'q' or url == 'Q':
+                print("-> Returning to main menu...")
+                return
+            
+            if not self.is_valid_yt_url(url):
+                # print("-> Invalid URL or unable to connect")
+                # print("-> Removing input...")
+                self.printErr("-> Invalid URL or unable to connect")
+                self.printErr("-> Removing input...")
+                print()
+                continue
+            
+            remove = url.find("&list=")
+
+            if remove != -1:
+                print("-> Sanitizing URL...")
+                url = url[:remove]
+                print("-> URL sanitized:", url)
+            
+            if url and url not in self.urls:
+                self.urls.append(url)
+                # print(f"-> Added URL ({len(self.urls)} total)")
+                self.printSuccess(f"-> Added URL ({len(self.urls)} total)")
+            else:
+                # print("-> URL is empty or already in list")
+                self.printErr("-> URL is empty or already in list")
+            
+            print()
 
 
     def remove_url(self):
@@ -86,9 +128,11 @@ class App:
                 removed_url = self.urls.pop(choice - 1)
                 print(f"-> Removed: {removed_url}")
             else:
-                print("-> Invalid number")
+                # print("-> Invalid number")
+                self.printErr("-> Invalid number")
         except ValueError:
-            print("-> Please enter a valid number")
+            # print("-> Please enter a valid number")
+            self.printErr("-> Please enter a valid number")
 
 
     def view_urls(self):
@@ -119,7 +163,8 @@ class App:
             return
 
         if not self.downloader:
-            print("Downloader not initialized")
+            # print("Downloader not initialized")
+            self.printErr("Downloader not initialized")
             return
 
         print(f"Starting download of {len(self.urls)} file(s)...")
@@ -135,11 +180,18 @@ class App:
                     successful_downloads += 1
                     
             except Exception as e:
-                print(f"Download {i} failed: {e}")
+                # print(f"Download {i} failed: {e}")
+                self.printErr(f"Download {i} failed: {e}")
         
         print()
-        print(f"Download summary: {successful_downloads}/{len(self.urls)} successful")
+        # print(f"Download summary: {successful_downloads}/{len(self.urls)} successful")
 
+        if successful_downloads == len(self.urls):
+            self.printSuccess(f"Download summary: {successful_downloads}/{len(self.urls)} successful")
+        elif successful_downloads < len(self.urls) and successful_downloads > 0:
+            print(f"\033[93mDownload summary: {successful_downloads}/{len(self.urls)} successful\033[0m")
+        else:
+            self.printErr(f"Download summary: {successful_downloads}/{len(self.urls)} successful")
 
     def run(self):
         print("----=====================================----")
@@ -147,7 +199,8 @@ class App:
         print("----=====================================----")
         print("[YTMP3] ---< Initializing FFMPEG >-----------")
         if not self.init_ffmpeg():
-            print("Failed to initialize FFMPEG")
+            # print("Failed to initialize FFMPEG")
+            self.printErr("Failed to initialize FFMPEG")
             sys.exit(1)
         print()
         print("----=====================================----")
@@ -157,7 +210,8 @@ class App:
         print("----=====================================----")
         print("[YTMP3] --< Initializing Downloader >--------")
         if not self.init_downloader():
-            print("Failed to initialize Downloader")
+            # print("Failed to initialize Downloader")
+            self.printErr("Failed to initialize Downloader")
             sys.exit(1)
         print()
         
@@ -190,13 +244,14 @@ class App:
             elif choice == "5":
                 self.download_all()
             elif choice == "6":
-                print("----=====================================----")
+                print("\033[93m" + "----=====================================----")
                 print("\\     -< Thank you for using YTMP3! >-      /")
                 print("/             -< Sinclair >-                \\")
-                print("----=====================================----")
+                print("----=====================================----" + "\033[0m")
                 break
             else:
-                print("Invalid choice. Please enter 1-6.")
+                # print("Invalid choice. Please enter 1-6.")
+                self.printErr("Invalid choice. Please enter 1-6.")
 
             print()
 
