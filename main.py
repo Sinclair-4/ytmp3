@@ -47,6 +47,7 @@ class App:
                 self.printSuccess(f"[YTMP3] -> Output set to: {Path(output)}")
                 return output
 
+
     def init_downloader(self) -> bool:
         try:
             self.downloader = YtMp3(
@@ -86,30 +87,29 @@ class App:
             if url == 'q' or url == 'Q':
                 print("[YTMP3] -> Returning to main menu...")
                 return
-            
-            if not self.is_valid_yt_url(url):
-                # print("-> Invalid URL or unable to connect")
-                # print("-> Removing input...")
-                self.printErr("[YTMP3] -> Invalid URL or unable to connect")
-                self.printErr("[YTMP3] -> Removing input...")
-                print()
-                continue
-            
-            remove = url.find("&list=")
+            try:
+                if not self.is_valid_yt_url(url):
+                    self.printErr("[YTMP3] -> Invalid URL or unable to connect")
+                    self.printErr("[YTMP3] -> Removing input...")
+                    print()
+                    continue
+                
+                remove = url.find("&list=")
 
-            if remove != -1:
-                print("[YTMP3] -> Sanitizing URL...")
-                url = url[:remove]
-                print("[YTMP3] -> URL sanitized:", url)
-            
-            if url and url not in self.urls:
-                self.urls.append(url)
-                # print(f"-> Added URL ({len(self.urls)} total)")
-                self.printSuccess(f"[YTMP3] -> Added URL ({len(self.urls)} total)")
-            else:
-                # print("-> URL is empty or already in list")
-                self.printErr("[YTMP3] -> URL is empty or already in list")
-            
+                if remove != -1:
+                    print("[YTMP3] -> Sanitizing URL...")
+                    url = url[:remove]
+                    print("[YTMP3] -> URL sanitized:", url)
+                
+                if url and url not in self.urls:
+                    self.urls.append(url)
+                    self.printSuccess(f"[YTMP3] -> Added URL ({len(self.urls)} total)")
+                else:
+                    self.printErr("[YTMP3] -> URL is empty or already in list")
+
+            except Exception as e:
+                self.printErr(f"[YTMP3] -> Error adding URL: {e}")
+
             print()
 
 
