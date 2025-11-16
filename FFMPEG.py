@@ -14,49 +14,21 @@ class FFMPEG:
         self.ffmpeg = 'ffmpeg.exe'
         self.ffprobe = 'ffprobe.exe'
 
-    def printErr(self, message):
-        print(f"\033[91m{message}\033[0m")
 
+    def printErr(self, message):
+        print(f"\033[91m[FFMPEG] -> {message}\033[0m")
     def printSuccess(self, message):
-        print(f"\033[92m{message}\033[0m")
+        print(f"\033[92m[FFMPEG] -> {message}\033[0m")
+
 
     def init_folder(self):
-        # Check if folder exists
         if not os.path.exists(self.folder):
             os.mkdir(self.folder)
-
-    # def download_zip(self):
-    #     # Check if zip is already downloaded
-    #     if os.path.exists(f"{self._dir}/{self.zip}"):
-    #         # print("-> FFMPEG zip is already downloaded.")
-    #         self.printSuccess("-> FFMPEG zip is already downloaded.")
-    #         return
-        
-    #     try:
-    #         print("-> Downloading FFmpeg...")
-    #         print("-> This will take a moment...")
-    #         response = requests.get(self.url, timeout=10)
-
-    #         if response.status_code == 200:
-    #             # Create the zipfile in the current directory
-    #             with open(f"{self._dir}/{self.zip}", 'wb') as file:
-    #                 file.write(response.content)
-
-    #             # print("-> File downloaded successfully!")
-    #             self.printSuccess("-> File downloaded successfully!")
-    #         else:
-    #             # print("-> Download failed.")
-    #             self.printErr("-> Download failed.")
-
-    #     except Exception as e:
-    #         # print("-> Error downloading file:", e)
-    #         self.printErr(f"-> Error downloading file: {e}")
 
 
     def download_zip(self):
         if os.path.exists(f"{self._dir}/{self.zip}"):
-            # print("-> FFMPEG zip is already downloaded.")
-            self.printSuccess("-> FFMPEG zip is already downloaded.")
+            self.printSuccess("FFMPEG zip is already downloaded.")
             return
         
         url = self.url
@@ -72,7 +44,7 @@ class FFMPEG:
                 total=total_size,
                 unit='B',
                 unit_scale=True,
-                desc=f"Downloading",
+                desc="[FFMPEG] -> Downloading",
                 ncols=40,
                 bar_format='{l_bar}{bar} | {n_fmt}/{total_fmt}'
             )
@@ -86,55 +58,62 @@ class FFMPEG:
             progress_bar.close()
 
             if total_size != 0 and progress_bar.n != total_size:
-                self.printErr("-> Download failed.")
+                self.printErr("Download failed.")
                 os.remove(f"{self._dir}/{filename}")
             else:
-                self.printSuccess("-> File downloaded successfully!")
+                self.printSuccess("File downloaded successfully!")
 
         except Exception as e:
-            self.printErr(f"-> Error downloading file: {e}")
+            self.printErr(f"Error downloading file: {e}")
             os.remove(f"{self._dir}/{filename}")
+ 
 
     def extract_zip(self):
-        with zip.ZipFile(f"{self._dir}/{self.zip}", "r") as z_ref:
-            try: 
-                print("-> Extracting FFmpeg executables...")
-                # Extract ffmpeg.exe and ffprobe.exe
+        try:
+            with zip.ZipFile(f"{self._dir}/{self.zip}", "r") as z_ref:
+                print("[FFMPEG] -> Extracting FFmpeg executables...")
                 ffmpeg = z_ref.read("ffmpeg-8.0-essentials_build/bin/ffmpeg.exe")
                 ffprobe = z_ref.read("ffmpeg-8.0-essentials_build/bin/ffprobe.exe")
 
-                # Create ffmpeg.exe in the ffmpeg folder
                 with open(f"{self.folder}/ffmpeg.exe", 'wb') as f:
                     f.write(ffmpeg)
 
-                # Create ffprobe.exe in the ffmpeg folder
                 with open(f"{self.folder}/ffprobe.exe", 'wb') as f:
                     f.write(ffprobe)
 
-                # print("-> FFmpeg executables extracted successfully!")
-                self.printSuccess("-> FFmpeg executables extracted successfully!")
-            except Exception as e:
-                # print("-> Error extracting FFmpeg executables:", e)
-                self.printErr(f"-> Error extracting FFmpeg executables: {e}")
+                self.printSuccess("FFmpeg executables extracted successfully!")
+        except zip.BadZipFile as e:
+            self.printErr(f"Error extracting FFmpeg executables: {e}")
+            self.printErr(f"Error type: {type(e).__name__}")
+
+            self.printErr(f"Attempting to download again...")
+            os.remove(f"{self._dir}/{self.zip}")
+            self.download_zip()
+
+        except Exception as e:
+            self.printErr(f"Error extracting FFmpeg executables: {e}")
+            self.printErr(f"Error type: {type(e).__name__}")
+
 
     def init(self):
-        print("[FFMPEG] Initializing...")
-        if os.path.exists("ffmpeg/ffmpeg.exe" and "ffmpeg/ffprobe.exe"):
-            # print("-> Executables found.")
-            self.printSuccess("-> Executables found.")
+        print("[FFMPEG] -> Initializing...")
+        if os.path.exists("ffmpeg/ffmpeg.exe") and os.path.exists("ffmpeg/ffprobe.exe"):
+            self.printSuccess("Executables found.")
             return
         
-        if os.path.exists(f"{self.folder}/ffmpeg"):
-            shutil.rmtree(f"{self.folder}/ffmpeg")
+        if os.path.exists(self.folder):
+            print("[FFMPEG] -> Removing old folder...")
+            shutil.rmtree(self.folder)
 
-        print("-> This will only run once.")
+        print("[FFMPEG] -> This will only run once.")
 
         self.init_folder()
         self.download_zip()
         self.extract_zip()
 
-        # Optional: remove zip file to save space
+        print("[FFMPEG] -> Removing zip file...")
         os.remove(f"{self._dir}/{self.zip}")
+
 
 if __name__ == "__main__":
     ffmpeg = FFMPEG()
