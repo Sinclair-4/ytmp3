@@ -1,14 +1,31 @@
-# YTMP3
+# YTMP3: A Learning Project in Media Processing
 
-A simple python script that allows you to download yt links as mp3 file
+This repository is a learning tool and a technical demonstration. It explores the fundamentals of handling online video streams, extracting audio, and performing format conversions using Python. It is intended for students, developers, and researchers to understand the underlying mechanics of media processing pipelines.
 
-## Url format
+# ⚠️ LEGAL DISCLAIMER
 
-```
-https://www.youtube.com/watch?v=xvFZjo5PgG0
- - or -
-https://www.youtube.com/watch?v=xvFZjo5PgG0&list=RDxvFZjo5PgG0&start_radio=1
-```
+## Copyright Notice
+This is an **EDUCATIONAL PROJECT** designed for:
+- Learning about media processing and Python development
+- Downloading content you own or have explicit permission to download
+- Accessing public domain or Creative Commons licensed material
+- Academic research and personal archival of self-created content
+
+## ❌ Strictly Prohibited Uses
+This tool MUST NOT be used for:
+- Copyright infringement of any kind
+- Downloading copyrighted music or videos without permission
+- Commercial redistribution of downloaded content
+- Violating YouTube's Terms of Service
+- Mass downloading of copyrighted material
+- Any illegal activities
+
+## 🔒 User Responsibility
+By using this software, you acknowledge and agree that:
+- You are solely responsible for ensuring your usage complies with all applicable laws
+- You will only download content you have legal rights to access
+- The developer assumes no liability for misuse
+- Violation of copyright laws may result in legal consequences
 
 ## Setup Instructions
 
@@ -39,24 +56,3 @@ This project uses:
 2. [FFmpeg](https://www.ffmpeg.org) (LGPL/GPL) – for audio and video processing. See [FFmpeg documentation](https://ffmpeg.org/documentation.html).  
 
 Special thanks to the open-source communities behind these tools for their amazing work.
-
-# LEGAL DISCLAIMER
-
-## Copyright Notice
-This software is intended for:
-- Downloading content you own or have permission to download
-- Accessing public domain or Creative Commons licensed material
-- Educational and research purposes
-
-## Prohibited Uses
-Do NOT use this tool for:
-- Copyright infringement
-- Commercial redistribution of downloaded content
-- Violating YouTube's Terms of Service
-- Any illegal activities
-
-## User Responsibility
-By using this software, you agree that:
-- You are solely responsible for your actions
-- You will comply with all applicable laws
-- The developer assumes no liability for misuse
