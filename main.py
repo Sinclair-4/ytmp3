@@ -193,6 +193,7 @@ class App:
             self.printErr(f"[YTMP3] -> Download summary: {successful_downloads}/{len(self.urls)} successful")
 
     def run(self):
+        print("[YTMP3] Project directory:", Path(__file__))
         print("----=====================================----")
         print("|              YTMP3 - Sinclair             |")
         print("----=====================================----")
